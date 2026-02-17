@@ -2,34 +2,34 @@
 import Foundation
 #if !COCOAPODS
 import FirebaseIntegration
-import AnalyticsIntegration
+//import AnalyticsIntegration
 import AppsflyerIntegration
 #endif
 import StoreKit
 
 extension CoreManager {
     func sendAppEnvironmentProperty() {
-        InternalUserProperty.app_environment.identify(parameter: AppEnvironment.current.rawValue)
+//        InternalUserProperty.app_environment.identify(parameter: AppEnvironment.current.rawValue)
     }
     
     func sendFirstLaunchEvent() {
-        InternalAnalyticsEvent.first_launch.log()
-        analyticsManager?.forceEventsUpload()
+//        InternalAnalyticsEvent.first_launch.log()
+//        analyticsManager?.forceEventsUpload()
     }
     
     func sendAttEvent(answer: Bool) {
         sendATTProperty(answer: answer)
-        InternalAnalyticsEvent.att_permission.log(parameter: answer)
-        analyticsManager?.forceEventsUpload()
+//        InternalAnalyticsEvent.att_permission.log(parameter: answer)
+//        analyticsManager?.forceEventsUpload()
     }
     
     func sendATTProperty(answer: Bool) {
-        InternalUserProperty.att_status.identify(parameter: "\(answer)")
+//        InternalUserProperty.att_status.identify(parameter: "\(answer)")
     }
     
     func sendDeepLinkUserProperties(deepLinkResult: [String: String]) {
-        let userProperties = deepLinkResult
-        InternalUserProperty.identify(userProperties)
+//        let userProperties = deepLinkResult
+//        InternalUserProperty.identify(userProperties)
     }
     
     func sendABTestsUserProperties(abTests: [any CoreRemoteABTestable], userSource: CoreUserSource) { // +
@@ -43,7 +43,7 @@ extension CoreManager {
             }
             partialResult[abtest.key] = value
         }
-        InternalUserProperty.identify(userProperties)
+//        InternalUserProperty.identify(userProperties)
     }
     
     func sendTestDistributionEvent(abTests: [any CoreRemoteABTestable], deepLinkResult: [String: String],
@@ -61,19 +61,19 @@ extension CoreManager {
         
         parameters = parameters + deepLinkResult
         
-        InternalAnalyticsEvent.test_distribution.log(parameters: parameters)
-        analyticsManager?.forceEventsUpload()
+//        InternalAnalyticsEvent.test_distribution.log(parameters: parameters)
+//        analyticsManager?.forceEventsUpload()
     }
     
     func sendStoreCountryUserProperty() {
         Task {
             let country = await Storefront.current?.countryCode ?? ""
-            InternalUserProperty.store_country.identify(parameter: country)
+//            InternalUserProperty.store_country.identify(parameter: country)
         }
     }
     
     func sendSubscriptionTypeUserProperty(identifier: String) {
-        InternalUserProperty.subscription_type.identify(parameter: identifier)
+//        InternalUserProperty.subscription_type.identify(parameter: identifier)
     }
 }
 

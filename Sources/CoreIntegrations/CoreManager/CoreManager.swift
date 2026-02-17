@@ -5,7 +5,7 @@ import AppsflyerIntegration
 import FacebookIntegration
 import AttributionServerIntegration
 import PurchasesIntegration
-import AnalyticsIntegration
+//import AnalyticsIntegration
 import FirebaseIntegration
 import SentryIntegration
 import AttestationIntegration
@@ -38,7 +38,7 @@ public class CoreManager {
     var purchaseManager: PurchasesManagerProtocol?
     
     var remoteConfigManager: CoreRemoteConfigManager?
-    var analyticsManager: AnalyticsManager?
+//    var analyticsManager: AnalyticsManager?
     var sentryManager: InternalSentryManagerProtocol = SentryManager.shared
     
     var delegate: CoreManagerDelegate?
@@ -47,11 +47,8 @@ public class CoreManager {
     
     
     func configureAll(configuration: CoreConfigurationProtocol) {
-        guard isConfigured == false else {
-            return
-        }
+        guard isConfigured == false else { return }
         isConfigured = true
-        
         let environmentVariables = ProcessInfo.processInfo.environment
         if let _ = environmentVariables["xctest_skip_config"] {
             
@@ -106,12 +103,12 @@ public class CoreManager {
             sentryManager.configure(sentryConfig)
         }
 
-        analyticsManager = AnalyticsManager.shared
+//        analyticsManager = AnalyticsManager.shared
         
-        let amplitudeCustomURL = configuration.amplitudeDataSource.customServerURL
-        analyticsManager?.configure(appKey: configuration.appSettings.amplitudeSecret, 
-                                    cnConfig: AppEnvironment.isChina,
-                                    customURL: amplitudeCustomURL)
+//        let amplitudeCustomURL = configuration.amplitudeDataSource.customServerURL
+//        analyticsManager?.configure(appKey: configuration.appSettings.amplitudeSecret, 
+//                                    cnConfig: AppEnvironment.isChina,
+//                                    customURL: amplitudeCustomURL)
         
         sendStoreCountryUserProperty()
         configuration.appSettings.launchCount += 1
@@ -130,7 +127,6 @@ public class CoreManager {
         appsflyerManager?.delegate = self
         
         facebookManager = FacebookManager()
-        
         purchaseManager = PurchasesManager.shared
         
         let attributionToken = configuration.appSettings.attributionServerSecret
@@ -164,7 +160,6 @@ public class CoreManager {
         }
 
         handleConfigurationEndCallback()
-        
         handleAttributionInstall()
     }
     
@@ -197,8 +192,7 @@ public class CoreManager {
                     InternalConfigurationEvent.remoteConfigLoaded.markAsCompleted()
                 }
             }
-            
-            self.analyticsManager?.setUserID(id)
+//            self.analyticsManager?.setUserID(id)
         }
         
         if configuration?.useDefaultATTRequest == true {
@@ -214,10 +208,8 @@ public class CoreManager {
         let attStatus = ATTrackingManager.trackingAuthorizationStatus
         guard attStatus == .notDetermined else {
             self.sendATTProperty(answer: attStatus == .authorized)
-            
             guard attAnswered == false else { return }
             attAnswered = true
-            
             handleATTAnswered(attStatus)
             return
         }
@@ -233,7 +225,6 @@ public class CoreManager {
         DispatchQueue.global().asyncAfter(deadline: .now() + 5) { [weak self] in
             guard self?.attAnswered == false else { return }
             self?.attAnswered = true
-            
             self?.sendAttEvent(answer: false)
             let status = ATTrackingManager.trackingAuthorizationStatus
             self?.handleATTAnswered(status)
@@ -250,7 +241,6 @@ public class CoreManager {
     
     func handleATTAnswered(_ status: ATTrackingManager.AuthorizationStatus) {
         AppConfigurationManager.shared?.startTimoutTimer()
-        
         InternalConfigurationEvent.attConcentGiven.markAsCompleted()
         if let configurationManager = AppConfigurationManager.shared {
             configurationManager.startTimoutTimer()
@@ -298,7 +288,6 @@ public class CoreManager {
                 InternalConfigurationEvent.attributionServerHandled.markAsCompleted()
             }
         }
-
     }
     
     func sendPurchaseToAttributionServer(_ details: PurchaseDetails) {
@@ -551,7 +540,6 @@ class ConfigurationResultManager {
                                                   bingPaywallName: bingPaywallName,
                                                   molocoPaywallName: molocoPaywallName,
                                                   applovinPaywallName: applovinPaywallName)
-        
         return coreManagerResult
     }
     

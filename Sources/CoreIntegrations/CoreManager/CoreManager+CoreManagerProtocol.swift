@@ -176,5 +176,4 @@ extension CoreManager: CoreManagerProtocol {
         self.handleATTAnswered(status)
         InternalConfigurationEvent.attConcentGiven.markAsCompleted()
     }
-    
 }
