@@ -28,7 +28,6 @@ public class CoreManager {
         return SentryManager.shared
     }
     
-    var attAnswered: Bool = false
     var isConfigured: Bool = false
     
     var configuration: CoreConfigurationProtocol?
@@ -150,18 +149,8 @@ public class CoreManager {
         
         AttributionServerManager.shared.configure(config: attributionConfiguration)
         
-        if configuration.useDefaultATTRequest {
-            configureATT()
-        }
-
         handleConfigurationEndCallback()
         handleAttributionInstall()
-    }
-    
-    func configureATT() {
-        NotificationCenter.default.addObserver(self, selector: #selector(applicationDidBecomeActive),
-                                               name: UIApplication.didBecomeActiveNotification,
-                                               object: nil)
     }
     
     @objc public func applicationDidBecomeActive() {
@@ -188,47 +177,8 @@ public class CoreManager {
 //            self.analyticsManager?.setUserID(id)
         }
         
-        if configuration?.useDefaultATTRequest == true {
-            requestATT()
-        }
-        
         Task {
             await purchaseManager?.updateProductStatus()
-        }
-    }
-    
-    func requestATT() {
-        let attStatus = ATTrackingManager.trackingAuthorizationStatus
-        guard attStatus == .notDetermined else {
-            self.sendATTProperty(answer: attStatus == .authorized)
-            guard attAnswered == false else { return }
-            attAnswered = true
-            handleATTAnswered(attStatus)
-            return
-        }
-                
-        /*
-         This stupid thing is made to be sure, that we'll handle ATT anyways, 100%
-         And it looks like that apple has a bug, at least in sandbox, when ATT == .notDetermined
-         but ATT alert for some reason not showing up, so it keeps unhandled and configuration never ends also
-         The only problem this solution brings - if user really don't unswer ATT for more than 5 seconds -
-         then we would think he didn't answer and the result would be false, even if he would answer true
-         in more than 3 seconds
-         */
-        DispatchQueue.global().asyncAfter(deadline: .now() + 5) { [weak self] in
-            guard self?.attAnswered == false else { return }
-            self?.attAnswered = true
-            self?.sendAttEvent(answer: false)
-            let status = ATTrackingManager.trackingAuthorizationStatus
-            self?.handleATTAnswered(status)
-        }
-            
-        ATTrackingManager.requestTrackingAuthorization { [weak self] status in
-            guard self?.attAnswered == false else { return }
-            self?.attAnswered = true
-            
-            self?.sendAttEvent(answer: status == .authorized)
-            self?.handleATTAnswered(status)
         }
     }
     
