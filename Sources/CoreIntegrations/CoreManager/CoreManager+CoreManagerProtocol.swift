@@ -23,7 +23,6 @@ extension CoreManager: CoreManagerProtocol {
             
             self.sendPurchaseToAttributionServer(details)
             self.sendPurchaseToFacebook(details)
-            self.sendPurchaseToAppsflyer(details)
             return .success(details: details)
         case .pending:
             return .pending
@@ -35,7 +34,7 @@ extension CoreManager: CoreManagerProtocol {
             return .unknown
         }
     }
-    
+
     @MainActor
     public func purchase(_ purchase: Purchase, promoOffer: PromoOffer, activeController: UIViewController?) async -> PurchasesPurchaseResult {
         guard let purchaseManager = purchaseManager else {return .error("purchaseManager == nil")}
@@ -53,7 +52,6 @@ extension CoreManager: CoreManagerProtocol {
             
             self.sendPurchaseToAttributionServer(details)
             self.sendPurchaseToFacebook(details)
-            self.sendPurchaseToAppsflyer(details)
             return .success(details: details)
         case .pending:
             return .pending
@@ -65,7 +63,7 @@ extension CoreManager: CoreManagerProtocol {
             return .unknown
         }
     }
-    
+
     private func groupFor(_ productId: String) -> any CorePurchaseGroup {
         let group = CoreManager.internalShared.configuration?.paywallDataSource.allPurchaseIdentifiers.first(where: {$0.id == productId})?.purchaseGroup
         return group ?? AppPurchaseGroup.Pro
@@ -155,20 +153,17 @@ extension CoreManager: CoreManagerProtocol {
     }
     
     public func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any]) -> Bool {
-        appsflyerManager?.application(app, open: url, options: options)
         return (facebookManager?.application(app, open: url, options: options) ?? false)
     }
-    
+
     public func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
-        appsflyerManager?.application(application, continue: userActivity, restorationHandler: restorationHandler) ?? false
+        return false
     }
-    
+
     public func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        appsflyerManager?.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
     }
-    
+
     public func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        appsflyerManager?.application(application, didReceiveRemoteNotification: userInfo, fetchCompletionHandler: completionHandler)
     }
     
     public func handleATTPermission(_ status: ATTrackingManager.AuthorizationStatus) {

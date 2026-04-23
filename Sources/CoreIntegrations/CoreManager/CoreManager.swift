@@ -1,7 +1,6 @@
 
 import UIKit
 #if !COCOAPODS
-import AppsflyerIntegration
 import FacebookIntegration
 import AttributionServerIntegration
 import PurchasesIntegration
@@ -33,7 +32,6 @@ public class CoreManager {
     var isConfigured: Bool = false
     
     var configuration: CoreConfigurationProtocol?
-    var appsflyerManager: AppfslyerManagerProtocol?
     var facebookManager: FacebookManagerProtocol?
     var purchaseManager: PurchasesManagerProtocol?
     
@@ -123,9 +121,6 @@ public class CoreManager {
                                                                  isFirstStart: configuration.appSettings.isFirstLaunch,
                                                                  timeout: configuration.configurationTimeout)
         
-        appsflyerManager = AppfslyerManager(config: configuration.appsflyerConfig)
-        appsflyerManager?.delegate = self
-        
         facebookManager = FacebookManager()
         purchaseManager = PurchasesManager.shared
         
@@ -133,8 +128,8 @@ public class CoreManager {
         let facebookData = AttributionFacebookModel(fbUserId: facebookManager?.userID ?? "",
                                                     fbUserData: facebookManager?.userData ?? "",
                                                     fbAnonId: facebookManager?.anonUserID ?? "")
-        let appsflyerToken = appsflyerManager?.appsflyerID
-        
+        let appsflyerToken: String? = nil
+
         purchaseManager?.initialize(allIdentifiers: configuration.paywallDataSource.allPurchaseIDs, proIdentifiers: configuration.paywallDataSource.allProPurchaseIDs)
 
         remoteConfigManager = CoreRemoteConfigManager(cnConfig: AppEnvironment.isChina)
@@ -180,8 +175,6 @@ public class CoreManager {
             id = uuid ?? AttributionServerManager.shared.uniqueUserID
         }
         if let id, id != "" {
-            appsflyerManager?.customerUserID = id
-            appsflyerManager?.startAppsflyer()
             purchaseManager?.setUserID(id)
             self.facebookManager?.userID = id
             sentryManager.setUserID(id)
@@ -311,17 +304,6 @@ public class CoreManager {
         self.facebookManager?.sendPurchaseAnalytics(analData)
     }
     
-    func sendPurchaseToAppsflyer(_ purchase: PurchaseDetails) {
-        guard appsflyerManager != nil else {
-            return
-        }
-        
-        let isTrial = purchase.product.subscription?.introductoryOffer != nil
-        if isTrial {
-            self.appsflyerManager?.logTrialPurchase()
-        }
-    }
-    
     func handleConfigurationEndCallback() {
         guard let configurationManager = AppConfigurationManager.shared else {
             assertionFailure()
@@ -356,7 +338,7 @@ public class CoreManager {
         let remoteResult = self.remoteConfigManager?.remoteConfigResult ?? [:]
         let asaResult = AttributionServerManager.shared.installResultData
         let isIPAT = asaResult?.isIPAT ?? false
-        let deepLinkResult = self.appsflyerManager?.deeplinkResult ?? [:]
+        let deepLinkResult: [String: String] = [:]
         let isASA = (asaResult?.asaAttribution["campaignName"] as? String != nil) ||
         (asaResult?.asaAttribution["campaign_name"] as? String != nil)
         

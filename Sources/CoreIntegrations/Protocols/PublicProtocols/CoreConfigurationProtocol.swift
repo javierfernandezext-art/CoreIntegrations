@@ -1,10 +1,6 @@
 
 import Foundation
 
-#if !COCOAPODS
-import AppsflyerIntegration
-#endif
-
 public protocol CoreConfigurationProtocol {
     var appSettings: CoreSettingsProtocol { get }
     var remoteConfigDataSource: any CoreRemoteDataSource { get }
@@ -24,8 +20,5 @@ public extension CoreConfigurationProtocol {
         return 6
     }
     
-    var appsflyerConfig: AppsflyerConfigData {
-        return AppsflyerConfigData(appsFlyerDevKey: appSettings.appsFlyerKey,
-                                   appleAppID: appSettings.appID)
-    }
+
 }

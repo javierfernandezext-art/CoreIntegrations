@@ -17,7 +17,6 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/firebase/firebase-ios-sdk.git", .upToNextMajor(from: "12.0.0")),
         .package(url: "https://github.com/facebook/facebook-ios-sdk", .upToNextMajor(from: "17.3.0")),
-        .package(url: "https://github.com/AppsFlyerSDK/AppsFlyerFramework-Dynamic", .upToNextMajor(from: "6.0.0")),
 //        .package(url: "https://github.com/amplitude/analytics-connector-ios.git", from: "1.0.0"),
 //        .package(url: "https://github.com/amplitude/Amplitude-iOS", from: "8.0.0"),
         .package(url: "https://github.com/getsentry/sentry-cocoa.git", .upToNextMajor(from: "8.35.0")),
@@ -27,7 +26,6 @@ let package = Package(
         // Targets can depend on other targets in this package, and on products in packages this package depends on.
         .target(name: "CoreIntegrations",
                 dependencies: [
-                    "AppsflyerIntegration",
                     "FacebookIntegration",
 //                    "AnalyticsIntegration",
                     "FirebaseIntegration",
@@ -38,15 +36,6 @@ let package = Package(
                 ],
                 linkerSettings: [
                   .linkedFramework("UIKit", .when(platforms: [.iOS])),
-                ]
-        ),
-        .target(name: "AppsflyerIntegration",
-                dependencies: [
-                    .product(name: "AppsFlyerLib-Dynamic", package: "AppsFlyerFramework-Dynamic")
-                ],
-                path: "Sources/AppsflyerIntegration",
-                linkerSettings: [
-                    .linkedFramework("UIKit", .when(platforms: [.iOS])),
                 ]
         ),
         .target(name: "FacebookIntegration",
