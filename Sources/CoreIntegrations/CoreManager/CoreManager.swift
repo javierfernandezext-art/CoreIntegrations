@@ -148,7 +148,12 @@ public class CoreManager {
                                                              facebookData: facebookData)
         
         AttributionServerManager.shared.configure(config: attributionConfiguration)
-        
+
+        // ATT is managed externally by the Elysium adapter.
+        // Mark attConcentGiven immediately so the configuration flow is not blocked.
+        InternalConfigurationEvent.attConcentGiven.markAsCompleted()
+        AppConfigurationManager.shared?.startTimoutTimer()
+
         handleConfigurationEndCallback()
         handleAttributionInstall()
     }
